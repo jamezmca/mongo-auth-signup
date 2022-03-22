@@ -1,4 +1,5 @@
 const fs = require('fs')
+const bcrypt = require('bcrypt')
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 8002
@@ -18,7 +19,22 @@ app.use(express.json())
 //Routes 
 app.post('/api/register', async (req, res) => {
     console.log(req.body)
-    res.status(200).json({ status: 'ok' })
+    const { username, password } = req.body
+
+    //Hashing the passwords
+    const encryptedPass = await bcrypt.hash(password, 10)
+
+    try {
+        const response = await User.create({
+            username,
+            password: encryptedPass
+        })
+        console.log('successfully created user', response)
+        res.status(200).json({ status: 'success' })
+
+    } catch (err) {
+        res.json({ status: 'error' })
+    }
 })
 
 app.get('/:file', async (req, res) => {

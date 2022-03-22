@@ -40,6 +40,11 @@
                 })
             })
             const data = await res.json()
+
+            if (data.status === 'success') {
+                username = ''
+                password = ''
+            }
         }
     </script>
 </body>
