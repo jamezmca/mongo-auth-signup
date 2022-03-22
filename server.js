@@ -3,11 +3,11 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 8002
 
-// const mongoose = require('mongoose')
-// mongoose.connect('mongodb://localhost/login', {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true
-// })
+const mongoose = require('mongoose')
+mongoose.connect('mongodb://localhost/login', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+})
 
 //Middlewares
 app.use(express.static(__dirname + '/public')) //if no other files, will serve index.html
