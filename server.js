@@ -4,10 +4,12 @@ const app = express()
 const port = process.env.PORT || 8002
 
 const mongoose = require('mongoose')
-mongoose.connect('mongodb://localhost/login', {
+const User = require('./model/user')
+mongoose.connect('mongodb://127.0.0.1:27017/login-demo', {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
+
 
 //Middlewares
 app.use(express.static(__dirname + '/public')) //if no other files, will serve index.html
@@ -16,7 +18,7 @@ app.use(express.json())
 //Routes 
 app.post('/api/register', async (req, res) => {
     console.log(req.body)
-    res.status(200).json({status: 'ok'})
+    res.status(200).json({ status: 'ok' })
 })
 
 app.get('/:file', async (req, res) => {
