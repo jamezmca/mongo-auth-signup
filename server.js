@@ -3,11 +3,20 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 8002
 
+// const mongoose = require('mongoose')
+// mongoose.connect('mongodb://localhost/login', {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true
+// })
+
+//Middleware
 app.use(express.static(__dirname + '/public')) //if no other files, will serve index.html
 app.use(express.json())
 
+//Routes 
 app.post('/api/register', async (req, res) => {
     console.log(req.body)
+    res.status(200).json({status: 'ok'})
 })
 
 app.get('/:file', async (req, res) => {
