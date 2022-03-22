@@ -16,7 +16,7 @@
         <input type="password" autocomplete="off" id="password" placeholder="Password" required
             class="transition bg-transparent duration-300 px-2 py-2 border-b border-solid border-white text-white shadow-lg focus:outline-none mx-auto w-96 max-w-full focus:border-teal-400" />
         <input type="submit" value="Submit"
-            class="cursor-pointer py-2 bg-gradient-to-r from-sky-500 to-teal-500 text-white transition duration-300 hover:opacity-50 mx-auto w-96 max-w-full uppercase" />
+            class="text-sm cursor-pointer py-4 bg-gradient-to-r from-sky-500 to-teal-500 text-white transition duration-300 hover:opacity-50 mx-auto w-96 max-w-full uppercase" />
     </form>
     <!-- <a class="text-blue-400 bg-black" href="/demo">link</a> nice -->
     <script>
@@ -26,8 +26,8 @@
         // 1. send data as json
         async function registerUser(e) {
             e.preventDefault()
-            const username = document.getElementById('username').value
-            const password = document.getElementById('password').value
+            const username = document.getElementById('username')
+            const password = document.getElementById('password')
 
             const res = await fetch('/api/register', {
                 method: 'POST',
@@ -35,16 +35,17 @@
                     'Content-Type': "application/json"
                 },
                 body: JSON.stringify({
-                    username,
-                    password
+                    username: username.value,
+                    password: password.value
                 })
             })
             const data = await res.json()
-
-            if (data.status === 'success') {
-                username = ''
-                password = ''
+            console.log(data)
+            if (data.status === 'error') {
+                return alert(data.error)
             }
+            username.value = ''
+            password.value = ''
         }
     </script>
 </body>
