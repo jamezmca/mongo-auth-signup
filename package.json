@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "tailwind:css": "postcss public/tailwind.css -o public/styles.css",
+    "tailwind:css": "postcss ./public/tailwind.css -o ./public/styles.css",
     "dev": "npm run tailwind:css && nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
