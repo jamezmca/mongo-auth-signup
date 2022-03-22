@@ -9,7 +9,7 @@ const port = process.env.PORT || 8002
 //     useUnifiedTopology: true
 // })
 
-//Middleware
+//Middlewares
 app.use(express.static(__dirname + '/public')) //if no other files, will serve index.html
 app.use(express.json())
 
