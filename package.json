@@ -1,0 +1,24 @@
+{
+  "name": "mongo-auth-signup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tailwind:css": "postcss public/tailwind.css -o public/styles.css",
+    "dev": "npm run tailwind:css && nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer": "^10.4.4",
+    "express": "^4.17.3",
+    "postcss": "^8.4.12",
+    "postcss-cli": "^9.1.0",
+    "tailwindcss": "^3.0.23"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
