@@ -3,12 +3,12 @@ const express = require('express')
 const app = express()
 const port = process.env.PORT || 8002
 
-// app.use(express.static(__dirname + '/public')) //if no other files, will serve index.html
+app.use(express.static(__dirname + '/public')) //if no other files, will serve index.html
+app.use(express.json())
 
-app.get('/', (req, res) => {
-    res.sendFile('demo.html', { root: __dirname + '/public' })
-}) 
-//could send file or just not bother and have the static route
+app.post('/api/register', async (req, res) => {
+    console.log(req.body)
+})
 
 app.get('/:file', async (req, res) => {
     const { file } = req.params

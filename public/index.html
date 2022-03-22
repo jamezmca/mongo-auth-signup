@@ -1,15 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="styles.css"/>
+    <link rel="stylesheet" href="styles.css" />
     <title>Document</title>
 </head>
-<body>
-    working
-    <a class="text-blue-400 bg-black" href="/demo">link</a> nice
 
+<body>
+    <form id="registration">
+        <input type="text" autocomplete="off" id="username" placeholder="Username" />
+        <input type="password" autocomplete="off" id="password" placeholder="Password" />
+        <input type="submit" value="Submit" />
+    </form>
+    <a class="text-blue-400 bg-black" href="/demo">link</a> nice
+    <script>
+        const form = document.getElementById('registration')
+        form.addEventListener('submit', registerUser)
+
+        // 1. send data as json
+        async function registerUser(e) {
+            e.preventDefault()
+            const username = document.getElementById('username').value
+            const password = document.getElementById('password').value
+
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': "application/json"
+                },
+                body: JSON.stringify({
+                    username,
+                    password
+                })
+            })
+            const data = await res.json()
+        }
+    </script>
 </body>
+
 </html>
