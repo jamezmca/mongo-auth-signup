@@ -31,7 +31,7 @@
             }
             const { status, error, data } = await res.json()
             const friendsList = document.getElementById('friends')
-            console.log(data)
+
             let newList = ''
             data.forEach(friend => {
                 newList += `<li>${friend}</li>`
