@@ -1,9 +1,12 @@
 const fs = require('fs')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const dotenv = require('dotenv')
+dotenv.config()
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 8002
+
 
 const mongoose = require('mongoose')
 const User = require('./model/user')
@@ -19,25 +22,76 @@ app.use(express.json())
 //JWT -> client proves itself on request & don't have to keep a stored state
 
 //Routes 
+app.post('/', async (req, res) => {
+    const { token } = req.body
+    console.log('main')
+    console.log(token)
+    try {
+        const user = jwt.verify(token, process.env.JWT_SECRET) //
+        const _id = user.id
+        const friendsList = await User.find({ _id })
+
+        res.json({ status: 'success', data: friendsList[0].friends })
+    } catch (err) {
+        res.redirect('/login')
+    }
+})
+
+app.post('/api/addFriend', async (req, res) => {
+    const { friend, token } = req.body
+    const user = jwt.verify(token, process.env.JWT_SECRET) //
+    const _id = user.id
+    const friendsList = await User.find({ _id })
+    try {
+        await User.updateOne({ _id }, {
+            $set: { friends: [...friendsList[0].friends, friend] }
+        })
+        res.status(200).send({ status: 'success' })
+    } catch (err) {
+        res.status(400)
+    }
+
+})
+
+app.post('/api/change-pass', async (req, res) => {
+    const { token, newpassword } = req.body
+    try {
+        const user = jwt.verify(token, process.env.JWT_SECRET) //
+        const _id = user.id
+        const hashedPassword = await bcrypt.hash(newpassword, 10)
+        await User.updateOne({ _id }, {
+            $set: { password: hashedPassword }
+        })
+        res.json({ status: 'success' })
+    } catch (err) {
+        res.json({ status: 'error', error: 'Invalid user' })
+    }
+})
+
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body
 
     const user = await User.findOne({ username }).lean()
+    const secret = process.env.JWT_SECRET
 
-    if (!username || !password || !await bcrypt.compare(password, user.password)) {
-        return res.json({ status: 'error', error: 'Invalid username or password' })
+    if (!username || !password) {
+        return res.json({ status: 'error', error: 'Please enter username and password' })
     } //guard clause. If this passes, then we get to successful code
+
+    if (!bcrypt.compare(password, user.password)) {
+        return res.json({ status: 'error', error: 'Invalid username or password' })
+    }
 
     //username passowrd combo is successful
     const token = jwt.sign({
         id: user._id, username: user.username
     }, process.env.JWT_SECRET)
 
-    res.json({ status: 'ok', data: token })
+    res.json({ status: 'ok', data: { token, username } })
 })
 
 app.post('/api/register', async (req, res) => {
-    console.log(req.body)
+
     const { username, password } = req.body
     if (!username || !password || typeof username !== 'string') {
         return res.json({ status: 'error', error: 'Incorrectly username' }) //otherwise status and data keys
@@ -52,7 +106,7 @@ app.post('/api/register', async (req, res) => {
             username,
             password: encryptedPass
         })
-        console.log('successfully created user', response)
+
         res.status(200).json({ status: 'success' })
 
     } catch (err) {

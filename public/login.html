@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css" />
+    <title>Login</title>
+</head>
+
+<body class="min-h-screen bg-slate-900">
+    <form id="registration" class="flex flex-col gap-6 mt-20 sm:mt-48">
+        <input type="text" autocomplete="off" id="username" placeholder="Username" required
+            class="transition bg-transparent duration-300 px-2 py-2 border-b border-solid border-white text-white shadow-lg focus:outline-none mx-auto w-96 max-w-full focus:border-teal-400" />
+        <input type="password" autocomplete="off" id="password" placeholder="Password" required
+            class="transition bg-transparent duration-300 px-2 py-2 border-b border-solid border-white text-white shadow-lg focus:outline-none mx-auto w-96 max-w-full focus:border-teal-400" />
+        <input type="submit" value="Submit"
+            class="text-sm cursor-pointer py-4 bg-gradient-to-r from-sky-500 to-teal-500 text-white transition duration-300 hover:opacity-50 mx-auto w-96 max-w-full uppercase" />
+    </form>
+    <div id="auth-button" class="uppercase text-white ">register</div>
+    <!-- <a class="text-blue-400 bg-black" href="/demo">link</a> nice -->
+    <script>
+        const form = document.getElementById('registration')
+        const authBtn = document.getElementById('auth-button')
+        form.addEventListener('submit', login) //default is login page
+
+        function changeBtn() {
+            const text = document.getElementById('auth-button').innerText
+            if (text === 'LOGIN') {
+                form.removeEventListener('submit', register)
+                form.addEventListener('submit', login)
+                authBtn.innerText = 'register'
+                console.log('will register on click')
+            } else {
+                form.removeEventListener('submit', login)
+                form.addEventListener('submit', register)
+                authBtn.innerText = 'login'
+                console.log('will login on click')
+
+            }
+        }
+
+        authBtn.addEventListener('click', changeBtn)
+
+        // 1. send data as json
+        async function register(e) {
+            e.preventDefault()
+            const username = document.getElementById('username')
+            const password = document.getElementById('password')
+            const res = await fetch(`/api/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': "application/json"
+                },
+                body: JSON.stringify({
+                    username: username.value,
+                    password: password.value
+                })
+            })
+            const { status, error } = await res.json()
+
+            if (status === 'error') {
+                return console.log(error)
+            } else {
+                changeBtn()
+                alert('Registered')
+            }
+        }
+
+        async function login(e) {
+            e.preventDefault()
+            const username = document.getElementById('username')
+            const password = document.getElementById('password')
+            const res = await fetch(`/api/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': "application/json"
+                },
+                body: JSON.stringify({
+                    username: username.value,
+                    password: password.value
+                })
+            })
+
+            const { status, error, data } = await res.json()
+            console.log('success', data)
+            if (status === 'error') {
+                console.log(error)
+            } else {
+                localStorage.setItem('james-tkn', JSON.stringify(data))
+                window.location.href = '/'
+            }
+        }
+
+    </script>
+</body>
+
+</html>

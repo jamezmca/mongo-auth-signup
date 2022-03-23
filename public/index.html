@@ -9,45 +9,62 @@
     <title>Document</title>
 </head>
 
-<body class="min-h-screen bg-slate-900">
-    <form id="registration" class="flex flex-col gap-6 mt-20 sm:mt-48">
-        <input type="text" autocomplete="off" id="username" placeholder="Username" required
-            class="transition bg-transparent duration-300 px-2 py-2 border-b border-solid border-white text-white shadow-lg focus:outline-none mx-auto w-96 max-w-full focus:border-teal-400" />
-        <input type="password" autocomplete="off" id="password" placeholder="Password" required
-            class="transition bg-transparent duration-300 px-2 py-2 border-b border-solid border-white text-white shadow-lg focus:outline-none mx-auto w-96 max-w-full focus:border-teal-400" />
-        <input type="submit" value="Submit"
-            class="text-sm cursor-pointer py-4 bg-gradient-to-r from-sky-500 to-teal-500 text-white transition duration-300 hover:opacity-50 mx-auto w-96 max-w-full uppercase" />
-    </form>
-    <!-- <a class="text-blue-400 bg-black" href="/demo">link</a> nice -->
+<body id="page" class="min-h-screen bg-slate-900 flex flex-col">
+    <ul class="mx-auto max-w-full w-fit text-white " id="friends"></ul>
+    <input id="addFriend" placeholder="friend name" class="outline-none" />
+    <input type="button" value="add friend" id="addFriendButton" class="text-teal-900 bg-teal-200 px-4 py-2"/>
+
     <script>
-        const form = document.getElementById('registration')
-        form.addEventListener('submit', registerUser)
-
-        // 1. send data as json
-        async function registerUser(e) {
-            e.preventDefault()
-            const username = document.getElementById('username')
-            const password = document.getElementById('password')
-
-            const res = await fetch('/api/register', {
+        async function main() {
+   
+            const res = await fetch('/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': "application/json"
                 },
                 body: JSON.stringify({
-                    username: username.value,
-                    password: password.value
+                    token: JSON.parse(localStorage.getItem('james-tkn'))?.token //can also he done in header
                 })
             })
-            const data = await res.json()
-            console.log(data)
-            if (data.status === 'error') {
-                return alert(data.error)
+            if (res.redirected) {
+                return window.location.href = res.url
             }
-            username.value = ''
-            password.value = ''
+            const { status, error, data } = await res.json()
+            const friendsList = document.getElementById('friends')
+            console.log(data)
+            let newList = ''
+            data.forEach(friend => {
+                newList += `<li>${friend}</li>`
+            })
+            friendsList.innerHTML = newList
+
         }
+        main()
+
+        async function addFriend(e) {
+            e.preventDefault()
+            const newFriend = document.getElementById('addFriend')
+            if (!newFriend) {
+                return
+            }
+            await fetch('/api/addFriend', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': "application/json"
+                },
+                body: JSON.stringify({
+                    friend: newFriend.value,
+                    token: JSON.parse(localStorage.getItem('james-tkn'))?.token
+                })
+            })
+            newFriend.value = ''
+
+            main()
+        }
+
+        document.getElementById('addFriendButton').addEventListener('click', addFriend)
     </script>
 </body>
+
 
 </html>
