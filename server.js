@@ -6,14 +6,18 @@ dotenv.config()
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 8002
-
-
 const mongoose = require('mongoose')
 const User = require('./model/user')
+
+//https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-os-x/
+//brew services restart mongodb-community
 mongoose.connect('mongodb://127.0.0.1:27017/login-demo', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
+const db = mongoose.connection
+db.on('error', (error) => console.error(error))
+db.once('open', () => console.log('connected to database'))
 
 
 //Middlewares
@@ -21,20 +25,40 @@ app.use(express.static(__dirname + '/public')) //if no other files, will serve i
 app.use(express.json())
 //JWT -> client proves itself on request & don't have to keep a stored state
 
-//Routes 
-app.post('/', async (req, res) => {
-    const { token } = req.body
-    console.log('main')
-    console.log(token)
-    try {
-        const user = jwt.verify(token, process.env.JWT_SECRET) //
-        const _id = user.id
-        const friendsList = await User.find({ _id })
+function authenticateToken(req, res, next) {
+    // const authHeader = req.headers['authorization']
+    // const token = authHeader && authHeader.split(' ')[1]
 
-        res.json({ status: 'success', data: friendsList[0].friends })
-    } catch (err) {
-        res.redirect('/login')
-    }
+    const { token } = req.body
+    if (token == null) { return res.sendStatus(401) }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        console.log(err)
+
+        if (err) { return res.status(403).redirect('/login') }
+
+        req.user = user
+
+        next()
+    })
+}
+
+//Routes 
+app.post('/', authenticateToken, async (req, res) => {
+    // const { token } = req.body
+    // console.log(token)
+    console.log('main')
+    const user = req.user
+    console.log(user)
+    // try {
+    // const user = jwt.verify(token, process.env.JWT_SECRET) //
+    const _id = user.id
+    const friendsList = await User.find({ _id })
+
+    res.json({ status: 'success', data: friendsList[0].friends })
+    // } catch (err) {
+    //     res.redirect('/login')
+    // }
 })
 
 app.post('/api/addFriend', async (req, res) => {
